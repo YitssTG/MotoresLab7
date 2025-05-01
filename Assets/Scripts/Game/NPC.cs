@@ -1,28 +1,42 @@
 using UnityEngine;
 using System.Collections;
+
 public class NPC : MonoBehaviour
 {
     [Header("Patrol Point")]
     [SerializeField] private Transform[] positions;
     [SerializeField] private float timePatrol;
+    [SerializeField] private float timeWait;
     private int currentPositionPatrol;
+
+    private bool isWaiting = false;
     private void Update()
     {
-        if(Vector3.Distance(transform.position, positions[currentPositionPatrol].position)< 1)
+        if (!isWaiting)
         {
-            UpdateTarget();
+            if (Vector3.Distance(transform.position, positions[currentPositionPatrol].position) == 0)
+            {
+                StartCoroutine(UpdateTarget());
+            }
+            else
+            {
+                transform.position = Vector3.MoveTowards(transform.position, positions[currentPositionPatrol].position, timePatrol * Time.deltaTime);
+            }
         }
-        transform.position =Vector3.MoveTowards(transform.position, positions[currentPositionPatrol].position, timePatrol*Time.deltaTime);
     }
-    private void UpdateTarget()
+
+    private IEnumerator UpdateTarget()
     {
-        if(currentPositionPatrol <positions.Length-1)
+        isWaiting = true;
+        yield return new WaitForSecondsRealtime(timeWait);
+        if (currentPositionPatrol < positions.Length - 1)
         {
-            ++currentPositionPatrol;
+            currentPositionPatrol++;
         }
         else
         {
             currentPositionPatrol = 0;
         }
+        isWaiting = false;
     }
 }
