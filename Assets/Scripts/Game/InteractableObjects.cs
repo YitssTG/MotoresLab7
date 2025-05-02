@@ -16,6 +16,7 @@ public class InteractableObjects : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             OnCollisionMusic?.Invoke(audioSettings.AudioMixerGroup, audioData.AudioClip);
+            UIManager.Instance.EfectFade();
         }
     }
     private void OnTriggerExit(Collider collision)
@@ -23,8 +24,8 @@ public class InteractableObjects : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             OnCollisionStopMusic?.Invoke(audioSettings.AudioMixerGroup);
-
             OnExitCollision?.Invoke(audioSettings.AudioMixerGroup, audioData.AudioClip);
+            UIManager.Instance.EfectFade();
         }
     }
 }
