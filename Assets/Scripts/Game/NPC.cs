@@ -1,8 +1,14 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.InputSystem;
+using System.Threading.Tasks;
 
 public class NPC : MonoBehaviour
 {
+    [Header("Dialgue")]
+    [SerializeField] private string dialogue;
+    private PlayerController player;
+
     [Header("Patrol Point")]
     [SerializeField] private Transform[] positions;
     [SerializeField] private float timePatrol;
@@ -10,6 +16,7 @@ public class NPC : MonoBehaviour
     private int currentPositionPatrol;
 
     private bool isWaiting = false;
+    private bool isPlayer;
     private void Update()
     {
         if (!isWaiting)
@@ -24,7 +31,6 @@ public class NPC : MonoBehaviour
             }
         }
     }
-
     private IEnumerator UpdateTarget()
     {
         isWaiting = true;
@@ -38,5 +44,35 @@ public class NPC : MonoBehaviour
             currentPositionPatrol = 0;
         }
         isWaiting = false;
+    }
+    public void Interactuve(InputAction.CallbackContext context)
+    {
+        if (context.performed && isPlayer)
+        {
+            StartCoroutine(ShowDialogueAndPause());
+        }
+    }
+
+    private IEnumerator ShowDialogueAndPause()
+    {
+        isWaiting = true; 
+        UIManager.Instance.DialogueNPC(dialogue); 
+        yield return new WaitForSeconds(2f); 
+        UIManager.Instance.HideDialogue();
+        isWaiting = false; 
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            isPlayer = true;
+        }
+    }
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            isPlayer = false;
+        }
     }
 }
